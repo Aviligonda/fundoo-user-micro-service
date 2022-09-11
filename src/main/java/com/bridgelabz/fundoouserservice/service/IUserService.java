@@ -3,7 +3,9 @@ package com.bridgelabz.fundoouserservice.service;
 import com.bridgelabz.fundoouserservice.dto.UserServiceDTO;
 import com.bridgelabz.fundoouserservice.model.UserServiceModel;
 import com.bridgelabz.fundoouserservice.util.Response;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.File;
 import java.util.List;
 /*
  * Purpose : IUserService to Show The all APIs
@@ -30,4 +32,7 @@ public interface IUserService {
     Response permanentDelete(Long id, String token);
 
     Response addProfilePic(String token, Long id, String profilePic);
+
+    Response addProfile(Long id, File profilePic);
+
 }

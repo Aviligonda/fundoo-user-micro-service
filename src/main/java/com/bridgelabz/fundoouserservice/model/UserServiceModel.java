@@ -4,6 +4,7 @@ import com.bridgelabz.fundoouserservice.dto.UserServiceDTO;
 import lombok.Data;
 
 import javax.persistence.*;
+import java.io.File;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 /*
@@ -25,7 +26,7 @@ public class UserServiceModel {
     private boolean isDeleted;
     private LocalDate dateOfBirth;
     private long phoneNumber;
-    private String profilePic;
+    private File profilePic;
     private LocalDateTime createdTime;
     private LocalDateTime updatedTime;
 
@@ -36,8 +37,6 @@ public class UserServiceModel {
         this.name = userServiceDTO.getName();
         this.emailId = userServiceDTO.getEmailId();
         this.password = userServiceDTO.getPassword();
-        this.isActive = userServiceDTO.isActive();
-        this.isDeleted = userServiceDTO.isDeleted();
         this.dateOfBirth = userServiceDTO.getDateOfBirth();
         this.phoneNumber = userServiceDTO.getPhoneNumber();
     }

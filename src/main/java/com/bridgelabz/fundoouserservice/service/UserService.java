@@ -7,11 +7,14 @@ import com.bridgelabz.fundoouserservice.repository.UserServiceRepository;
 import com.bridgelabz.fundoouserservice.util.Response;
 import com.bridgelabz.fundoouserservice.util.TokenUtil;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.io.File;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
+
 /*
  * Purpose : AdminService to Implement the Business Logic
  * Version : 1.0
@@ -25,6 +28,9 @@ public class UserService implements IUserService {
     TokenUtil tokenUtil;
     @Autowired
     UserServiceRepository userServiceRepository;
+    @Autowired
+    PasswordEncoder passwordEncoder;
+
     /*
      * Purpose : Implement the Logic of Creating User Details
      * @author : Aviligonda Sreenivasulu
@@ -34,12 +40,16 @@ public class UserService implements IUserService {
     public Response createUser(UserServiceDTO userServiceDTO) {
         UserServiceModel userServiceModel = new UserServiceModel(userServiceDTO);
         userServiceModel.setCreatedTime(LocalDateTime.now());
+        userServiceModel.setPassword(passwordEncoder.encode(userServiceDTO.getPassword()));
+        userServiceModel.setDeleted(false);
+        userServiceModel.setActive(true);
         userServiceRepository.save(userServiceModel);
         String body = "User Added Successfully with user id is :" + userServiceModel.getId();
         String subject = "User Registration Successfully";
         mailService.send(userServiceModel.getEmailId(), body, subject);
         return new Response(200, "Success", userServiceModel);
     }
+
     /*
      * Purpose : Implement the Logic of Update User Details
      * @author : Aviligonda Sreenivasulu
@@ -55,9 +65,6 @@ public class UserService implements IUserService {
                 isIdPresent.get().setName(userServiceDTO.getName());
                 isIdPresent.get().setEmailId(userServiceDTO.getEmailId());
                 isIdPresent.get().setDateOfBirth(userServiceDTO.getDateOfBirth());
-                isIdPresent.get().setActive(userServiceDTO.isActive());
-                isIdPresent.get().setDeleted(userServiceDTO.isDeleted());
-                isIdPresent.get().setPassword(userServiceDTO.getPassword());
                 isIdPresent.get().setPhoneNumber(userServiceDTO.getPhoneNumber());
                 isIdPresent.get().setUpdatedTime(LocalDateTime.now());
                 userServiceRepository.save(isIdPresent.get());
@@ -71,6 +78,7 @@ public class UserService implements IUserService {
         }
         throw new UserException(400, "Token is Wrong");
     }
+
     /*
      * Purpose : Implement the Logic of Get All User Details
      * @author : Aviligonda Sreenivasulu
@@ -91,6 +99,7 @@ public class UserService implements IUserService {
         }
         throw new UserException(400, "Token is Wrong");
     }
+
     /*
      * Purpose : Implement the Logic of Login credentials
      * @author : Aviligonda Sreenivasulu
@@ -110,6 +119,7 @@ public class UserService implements IUserService {
             throw new UserException(400, "Not found this EmailId");
         }
     }
+
     /*
      * Purpose : Implement the Logic of Update Password
      * @author : Aviligonda Sreenivasulu
@@ -123,7 +133,7 @@ public class UserService implements IUserService {
             Optional<UserServiceModel> isEmailPresent = userServiceRepository.findByEmailId(emailId);
             if (isEmailPresent.isPresent()) {
                 if (isEmailPresent.get().getPassword().equals(oldPassword)) {
-                    isEmailPresent.get().setPassword(newPassword);
+                    isEmailPresent.get().setPassword(passwordEncoder.encode(newPassword));
                     userServiceRepository.save(isEmailPresent.get());
                     return new Response(200, "Success", isEmailPresent.get());
                 } else {
@@ -134,6 +144,7 @@ public class UserService implements IUserService {
         }
         throw new UserException(400, "Token is Wrong");
     }
+
     /*
      * Purpose : Implement the Logic of Reset Password
      * @author : Aviligonda Sreenivasulu
@@ -154,6 +165,7 @@ public class UserService implements IUserService {
             throw new UserException(400, "Email is not found");
         }
     }
+
     /*
      * Purpose : Implement the Logic of Delete user Details
      * @author : Aviligonda Sreenivasulu
@@ -166,17 +178,21 @@ public class UserService implements IUserService {
         if (isUserPresent.isPresent()) {
             Optional<UserServiceModel> isIdPresent = userServiceRepository.findById(id);
             if (isIdPresent.isPresent()) {
-                isIdPresent.get().setActive(false);
-                isIdPresent.get().setDeleted(true);
-                userServiceRepository.save(isIdPresent.get());
-                return new Response(200, "Success", isIdPresent.get());
+                if (isIdPresent.get().isActive()) {
+                    isIdPresent.get().setActive(false);
+                    isIdPresent.get().setDeleted(true);
+                    userServiceRepository.save(isIdPresent.get());
+                    return new Response(200, "Success", isIdPresent.get());
+                } else {
+                    throw new UserException(400, "This User not in active ");
+                }
             } else {
                 throw new UserException(400, "Not found with this id ");
             }
-        } else {
-            throw new UserException(400, "Token is wrong");
         }
+        throw new UserException(400, "Token is wrong");
     }
+
     /*
      * Purpose : Implement the Logic of restore Admin Details
      * @author : Aviligonda Sreenivasulu
@@ -189,17 +205,21 @@ public class UserService implements IUserService {
         if (isUserPresent.isPresent()) {
             Optional<UserServiceModel> isIdPresent = userServiceRepository.findById(id);
             if (isIdPresent.isPresent()) {
-                isIdPresent.get().setActive(true);
-                isIdPresent.get().setDeleted(false);
-                userServiceRepository.save(isIdPresent.get());
-                return new Response(200, "Success", isIdPresent.get());
+                if (isIdPresent.get().isDeleted()) {
+                    isIdPresent.get().setActive(true);
+                    isIdPresent.get().setDeleted(false);
+                    userServiceRepository.save(isIdPresent.get());
+                    return new Response(200, "Success", isIdPresent.get());
+                } else {
+                    throw new UserException(400, "This Id Not in Deleted ");
+                }
             } else {
-                throw new UserException(400, "Not found with this id ");
+                throw new UserException(400, "Not found with this id");
             }
-        } else {
-            throw new UserException(400, "Token is wrong");
         }
+        throw new UserException(400, "Token is wrong");
     }
+
     /*
      * Purpose : Implement the Logic of PermanentDelete user Details
      * @author : Aviligonda Sreenivasulu
@@ -212,15 +232,19 @@ public class UserService implements IUserService {
         if (isUserPresent.isPresent()) {
             Optional<UserServiceModel> isIdPresent = userServiceRepository.findById(id);
             if (isIdPresent.isPresent()) {
-                userServiceRepository.delete(isIdPresent.get());
-                return new Response(200, "Success", isIdPresent.get());
+                if (isIdPresent.get().isDeleted()) {
+                    userServiceRepository.delete(isIdPresent.get());
+                    return new Response(200, "Success", isIdPresent.get());
+                } else {
+                    throw new UserException(400, "The User Not in delete ");
+                }
             } else {
-                throw new UserException(400, "Not found with this id ");
+                throw new UserException(400, "Not found with this id");
             }
-        } else {
-            throw new UserException(400, "Token is wrong");
         }
+        throw new UserException(400, "Token is wrong");
     }
+
     /*
      * Purpose : Implement the Logic of Adding the ProfilePath
      * @author : Aviligonda Sreenivasulu
@@ -233,7 +257,7 @@ public class UserService implements IUserService {
         if (isUserPresent.isPresent()) {
             Optional<UserServiceModel> isIdPresent = userServiceRepository.findById(id);
             if (isIdPresent.isPresent()) {
-                isIdPresent.get().setProfilePic(profilePic);
+//                isIdPresent.get().setProfilePic(profilePic);
                 userServiceRepository.save(isIdPresent.get());
                 return new Response(200, "success", isIdPresent.get());
             } else {
@@ -242,5 +266,15 @@ public class UserService implements IUserService {
         } else {
             throw new UserException(400, "Token is Wrong");
         }
+    }
+
+    @Override
+    public Response addProfile(Long id, File profilePic) {
+        Optional<UserServiceModel> isIdPresent = userServiceRepository.findById(id);
+        if (isIdPresent.isPresent()) {
+            isIdPresent.get().setProfilePic(profilePic);
+            return new Response(200, "Success", isIdPresent.get());
+        }
+        return null;
     }
 }

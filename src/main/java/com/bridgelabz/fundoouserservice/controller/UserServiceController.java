@@ -8,9 +8,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.Valid;
+import java.io.File;
 import java.util.List;
+
 /*
  * Purpose :REST ApIs Controller
  * Version : 1.0
@@ -22,6 +25,7 @@ import java.util.List;
 public class UserServiceController {
     @Autowired
     IUserService userService;
+
     /*
      * Purpose : User Details Create
      * @author : Aviligonda Sreenivasulu
@@ -32,6 +36,7 @@ public class UserServiceController {
         Response response = userService.createUser(userServiceDTO);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
+
     /*
      * Purpose : Existing User Details Update
      * @author : Aviligonda Sreenivasulu
@@ -40,10 +45,11 @@ public class UserServiceController {
     @PutMapping("/update/{id}")
     public ResponseEntity<Response> updateUser(@PathVariable Long id,
                                                @RequestHeader String token,
-                                               @Valid@RequestBody UserServiceDTO userServiceDTO) {
+                                               @Valid @RequestBody UserServiceDTO userServiceDTO) {
         Response response = userService.updateUser(userServiceDTO, token, id);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
+
     /*
      * Purpose : Retrive All User Details
      * @author : Aviligonda Sreenivasulu
@@ -54,6 +60,7 @@ public class UserServiceController {
         List<UserServiceModel> response = userService.getAllUsers(token);
         return new ResponseEntity<List<?>>(response, HttpStatus.OK);
     }
+
     /*
      * Purpose : Login  with admin Email and Password
      * @author : Aviligonda Sreenivasulu
@@ -65,6 +72,7 @@ public class UserServiceController {
         Response response = userService.loginUser(emailId, password);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
+
     /*
      * Purpose : Update Login Password
      * @author : Aviligonda Sreenivasulu
@@ -78,6 +86,7 @@ public class UserServiceController {
         Response response = userService.changePassword(emailId, oldPassword, newPassword, token);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
+
     /*
      * Purpose : Reset Login Password
      * @author : Aviligonda Sreenivasulu
@@ -100,6 +109,7 @@ public class UserServiceController {
         Response response = userService.deleteUser(id, token);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
+
     /*
      * Purpose : Restore user Details
      * @author : Aviligonda Sreenivasulu
@@ -111,6 +121,7 @@ public class UserServiceController {
         Response response = userService.restoreUser(id, token);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
+
     /*
      * Purpose : permanentDelete user Details
      * @author : Aviligonda Sreenivasulu
@@ -122,6 +133,7 @@ public class UserServiceController {
         Response response = userService.permanentDelete(id, token);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
+
     /*
      * Purpose : Set Profile Path of User
      * @author : Aviligonda Sreenivasulu
@@ -132,7 +144,14 @@ public class UserServiceController {
                                                @PathVariable Long id,
                                                @RequestParam String profilePic) {
         Response response = userService.addProfilePic(token, id, profilePic);
-            return new ResponseEntity<>(response, HttpStatus.OK);
-        }
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+    @PostMapping("/addProfilePic/{id}")
+    public ResponseEntity<Response> addProfilePic(@PathVariable Long id,
+                                                  @RequestParam(value = "File") File profilePic) {
+        Response response = userService.addProfile(id, profilePic);
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
 
 }
