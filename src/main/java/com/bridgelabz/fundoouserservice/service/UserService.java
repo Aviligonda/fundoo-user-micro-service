@@ -9,6 +9,7 @@ import com.bridgelabz.fundoouserservice.util.TokenUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.time.LocalDateTime;
@@ -109,7 +110,8 @@ public class UserService implements IUserService {
     public Response loginUser(String emailId, String password) {
         Optional<UserServiceModel> isEmailPresent = userServiceRepository.findByEmailId(emailId);
         if (isEmailPresent.isPresent()) {
-            if (isEmailPresent.get().getPassword().equals(password)) {
+//            if (isEmailPresent.get().getPassword().equals(password)) {
+            if (passwordEncoder.matches(password, isEmailPresent.get().getPassword())) {
                 String token = tokenUtil.createToken(isEmailPresent.get().getId());
                 return new Response(200, "Login Success", token);
             } else {
@@ -269,10 +271,10 @@ public class UserService implements IUserService {
     }
 
     @Override
-    public Response addProfile(Long id, File profilePic) {
+    public Response addProfile(Long id, MultipartFile profilePic) {
         Optional<UserServiceModel> isIdPresent = userServiceRepository.findById(id);
         if (isIdPresent.isPresent()) {
-            isIdPresent.get().setProfilePic(profilePic);
+            isIdPresent.get().setProfilePic((File) profilePic);
             return new Response(200, "Success", isIdPresent.get());
         }
         return null;

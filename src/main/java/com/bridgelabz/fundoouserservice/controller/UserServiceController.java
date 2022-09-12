@@ -103,7 +103,7 @@ public class UserServiceController {
      * @Param : token and id
      * */
 
-    @PutMapping("/deleteUser/{id}")
+    @DeleteMapping("/deleteUser/{id}")
     public ResponseEntity<Response> deleteUser(@PathVariable Long id,
                                                @RequestHeader String token) {
         Response response = userService.deleteUser(id, token);
@@ -149,7 +149,7 @@ public class UserServiceController {
 
     @PostMapping("/addProfilePic/{id}")
     public ResponseEntity<Response> addProfilePic(@PathVariable Long id,
-                                                  @RequestParam(value = "File") File profilePic) {
+                                                  @RequestParam(value = "File") MultipartFile profilePic) {
         Response response = userService.addProfile(id, profilePic);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
