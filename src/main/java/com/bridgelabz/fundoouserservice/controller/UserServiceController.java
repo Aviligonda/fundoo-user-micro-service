@@ -153,5 +153,14 @@ public class UserServiceController {
         Response response = userService.addProfile(id, profilePic);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
+    /*
+     * Purpose : Validate the Token
+     * @author : Aviligonda Sreenivasulu
+     * @Param :   token
+     * */
+    @GetMapping("/validate/{token}")
+    public Boolean validateToken(@PathVariable String token) {
+        return userService.validateToken(token);
+    }
 
 }

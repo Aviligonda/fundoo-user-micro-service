@@ -279,4 +279,18 @@ public class UserService implements IUserService {
         }
         return null;
     }
+
+    @Override
+    public Boolean validateToken(String token) {
+        Long userId = tokenUtil.decodeToken(token);
+        Optional<UserServiceModel> isUserPresent = userServiceRepository.findById(userId);
+        if (isUserPresent.isPresent()) {
+            if (isUserPresent.get().isActive()) {
+                return true;
+            } else {
+                throw new UserException(400, "User Not in Active");
+            }
+        }
+        throw new UserException(400, "User Not Present");
+    }
 }

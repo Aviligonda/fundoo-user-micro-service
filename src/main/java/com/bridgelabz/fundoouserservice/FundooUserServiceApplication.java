@@ -18,6 +18,5 @@ public class FundooUserServiceApplication {
     @Bean
     public PasswordEncoder passwordencoder() {
         return new BCryptPasswordEncoder();
-
     }
 }

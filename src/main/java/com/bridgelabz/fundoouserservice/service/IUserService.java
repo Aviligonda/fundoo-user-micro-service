@@ -34,4 +34,5 @@ public interface IUserService {
 
     Response addProfile(Long id, MultipartFile profilePic);
 
+    Boolean validateToken(String token);
 }
