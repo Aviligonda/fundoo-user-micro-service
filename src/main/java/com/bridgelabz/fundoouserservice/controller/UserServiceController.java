@@ -171,4 +171,13 @@ public class UserServiceController {
         return userService.validateToken(token);
     }
 
+    /*
+     * Purpose : Validate the EmailId
+     * @author : Aviligonda Sreenivasulu
+     * @Param :   emailId
+     * */
+    @GetMapping("/emailValidation/{emailId}")
+    public Boolean emailValidation(@PathVariable String emailId) {
+        return userService.emailValidation(emailId);
+    }
 }

@@ -269,6 +269,11 @@ public class UserService implements IUserService {
             throw new UserException(400, "Token is Wrong");
         }
     }
+    /*
+     * Purpose : Implement the Logic of Adding the ProfilePath
+     * @author : Aviligonda Sreenivasulu
+     * @Param :  token,id and profilePath
+     * */
 
     @Override
     public Response addProfile(Long id, MultipartFile profilePic, String token) throws IOException {
@@ -287,12 +292,35 @@ public class UserService implements IUserService {
         throw new UserException(400, "Token is Wrong");
     }
 
+    /*
+     * Purpose : Implement the Logic of Validate Token
+     * @author : Aviligonda Sreenivasulu
+     * @Param :  token
+     * */
     @Override
     public Boolean validateToken(String token) {
         Long userId = tokenUtil.decodeToken(token);
         Optional<UserServiceModel> isUserPresent = userServiceRepository.findById(userId);
         if (isUserPresent.isPresent()) {
             if (isUserPresent.get().isActive()) {
+                return true;
+            } else {
+                throw new UserException(400, "User Not in Active");
+            }
+        }
+        throw new UserException(400, "User Not Present");
+    }
+
+    /*
+     * Purpose : Implement the Logic of Validate EmailId
+     * @author : Aviligonda Sreenivasulu
+     * @Param :  emailId
+     * */
+    @Override
+    public Boolean emailValidation(String emailId) {
+        Optional<UserServiceModel> isEmailPresent = userServiceRepository.findByEmailId(emailId);
+        if (isEmailPresent.isPresent()) {
+            if (isEmailPresent.get().isActive()) {
                 return true;
             } else {
                 throw new UserException(400, "User Not in Active");
