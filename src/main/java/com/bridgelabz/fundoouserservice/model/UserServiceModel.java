@@ -4,9 +4,10 @@ import com.bridgelabz.fundoouserservice.dto.UserServiceDTO;
 import lombok.Data;
 
 import javax.persistence.*;
-import java.io.File;
+import java.sql.Blob;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+
 /*
  * Purpose : UserServiceModel Are Used Create A table and connection to Database
  * Version : 1.0
@@ -26,7 +27,9 @@ public class UserServiceModel {
     private boolean isDeleted;
     private LocalDate dateOfBirth;
     private long phoneNumber;
-    private File profilePic;
+    //    private String profilePic;
+    @Lob
+    private byte[] profilePic;
     private LocalDateTime createdTime;
     private LocalDateTime updatedTime;
 

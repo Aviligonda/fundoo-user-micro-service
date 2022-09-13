@@ -11,7 +11,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.File;
+import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -271,13 +271,20 @@ public class UserService implements IUserService {
     }
 
     @Override
-    public Response addProfile(Long id, MultipartFile profilePic) {
-        Optional<UserServiceModel> isIdPresent = userServiceRepository.findById(id);
-        if (isIdPresent.isPresent()) {
-            isIdPresent.get().setProfilePic((File) profilePic);
-            return new Response(200, "Success", isIdPresent.get());
+    public Response addProfile(Long id, MultipartFile profilePic, String token) throws IOException {
+        Long userId = tokenUtil.decodeToken(token);
+        Optional<UserServiceModel> isUserPresent = userServiceRepository.findById(userId);
+        if (isUserPresent.isPresent()) {
+            Optional<UserServiceModel> isIdPresent = userServiceRepository.findById(id);
+            if (isIdPresent.isPresent()) {
+                isIdPresent.get().setProfilePic(profilePic.getBytes());
+                userServiceRepository.save(isIdPresent.get());
+                return new Response(200, "Success", isIdPresent.get());
+            } else {
+                throw new UserException(400, "Not found with this id");
+            }
         }
-        return null;
+        throw new UserException(400, "Token is Wrong");
     }
 
     @Override

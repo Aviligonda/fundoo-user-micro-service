@@ -5,6 +5,7 @@ import com.bridgelabz.fundoouserservice.model.UserServiceModel;
 import com.bridgelabz.fundoouserservice.util.Response;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.List;
 /*
  * Purpose : IUserService to Show The all APIs
@@ -32,7 +33,7 @@ public interface IUserService {
 
     Response addProfilePic(String token, Long id, String profilePic);
 
-    Response addProfile(Long id, MultipartFile profilePic);
+    Response addProfile(Long id, MultipartFile profilePic, String token) throws IOException;
 
     Boolean validateToken(String token);
 }

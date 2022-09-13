@@ -12,6 +12,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.Valid;
 import java.io.File;
+import java.io.IOException;
 import java.util.List;
 
 /*
@@ -147,12 +148,19 @@ public class UserServiceController {
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
+    /*
+     * Purpose : Set ProfileFile  of User
+     * @author : Aviligonda Sreenivasulu
+     * @Param :  profilePic,id and token
+     * */
     @PostMapping("/addProfilePic/{id}")
     public ResponseEntity<Response> addProfilePic(@PathVariable Long id,
-                                                  @RequestParam(value = "File") MultipartFile profilePic) {
-        Response response = userService.addProfile(id, profilePic);
+                                                  @RequestBody MultipartFile profilePic,
+                                                  @RequestHeader String token) throws IOException {
+        Response response = userService.addProfile(id, profilePic, token);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
+
     /*
      * Purpose : Validate the Token
      * @author : Aviligonda Sreenivasulu
