@@ -298,12 +298,13 @@ public class UserService implements IUserService {
      * @Param :  token
      * */
     @Override
-    public Boolean validateToken(String token) {
+    public Response validateToken(String token) {
         Long userId = tokenUtil.decodeToken(token);
         Optional<UserServiceModel> isUserPresent = userServiceRepository.findById(userId);
         if (isUserPresent.isPresent()) {
             if (isUserPresent.get().isActive()) {
-                return true;
+                return new Response(200, "User Found", isUserPresent.get());
+
             } else {
                 throw new UserException(400, "User Not in Active");
             }
@@ -317,11 +318,11 @@ public class UserService implements IUserService {
      * @Param :  emailId
      * */
     @Override
-    public Boolean emailValidation(String emailId) {
+    public Response emailValidation(String emailId) {
         Optional<UserServiceModel> isEmailPresent = userServiceRepository.findByEmailId(emailId);
         if (isEmailPresent.isPresent()) {
             if (isEmailPresent.get().isActive()) {
-                return true;
+                return new Response(200, "User Found", isEmailPresent.get());
             } else {
                 throw new UserException(400, "User Not in Active");
             }

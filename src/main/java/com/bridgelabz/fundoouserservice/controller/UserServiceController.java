@@ -167,7 +167,7 @@ public class UserServiceController {
      * @Param :   token
      * */
     @GetMapping("/validate/{token}")
-    public Boolean validateToken(@PathVariable String token) {
+    public Response validateToken(@PathVariable String token) {
         return userService.validateToken(token);
     }
 
@@ -177,7 +177,7 @@ public class UserServiceController {
      * @Param :   emailId
      * */
     @GetMapping("/emailValidation/{emailId}")
-    public Boolean emailValidation(@PathVariable String emailId) {
+    public Response emailValidation(@PathVariable String emailId) {
         return userService.emailValidation(emailId);
     }
 }

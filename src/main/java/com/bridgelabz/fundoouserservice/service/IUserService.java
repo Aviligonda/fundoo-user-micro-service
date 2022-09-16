@@ -35,7 +35,7 @@ public interface IUserService {
 
     Response addProfile(Long id, MultipartFile profilePic, String token) throws IOException;
 
-    Boolean validateToken(String token);
+    Response validateToken(String token);
 
-    Boolean emailValidation(String emailId);
+    Response emailValidation(String emailId);
 }
